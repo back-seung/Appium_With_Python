@@ -6,6 +6,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from datetime import datetime
 from ppadb.client import Client as AdbClient
 from selenium.webdriver.common.keys import Keys
+from appium.webdriver.common.touch_action import TouchAction
 
 import os
 import subprocess
@@ -20,6 +21,19 @@ if not os.path.exists(PULL_LOCAL_PATH):
     os.mkdir(PULL_LOCAL_PATH)
     print(PULL_LOCAL_PATH)
 
+def extract_coordinates(bounds: str) -> tuple:
+    coords = bounds.replace("][", ",").strip("[]").split(",")
+    x_start, y_start, x_end, y_end = map(int, coords)
+
+    return x_start, y_start, x_end, y_end
+def tab_element(element, bounds):
+    x_start, y_start, x_end, y_end = extract_coordinates(element.get_attributes("bounds"))
+
+    x = (x_start + x_end) // 2
+    y = (y_start + y_end) // 2
+
+    touch_action = TouchAction(driver)
+    touch_action.tap(None, x, y).perform()
 
 def find_by(by_val, dest, need_suffixs):
     by = {"ID": By.ID, "XPATH": By.XPATH, "CLASS": By.CLASS_NAME}
@@ -100,30 +114,30 @@ find_by("ID", "done", True).click()
 # + 버튼 클릭
 find_by("ID", "actionCreateHabit", True).click()
 find_by("ID", "buttonYesNo", True).click()
-#
-# # 제목 입력
-# input_textbox(find_by("ID", "nameInput", True), "테스트 진행 여부 확인")
-#
-# # 색상 설정 클릭
-# for i in range(20):
-#     find_by("ID", "colorButton", True).click()
-#     find_by("XPATH", '//android.widget.FrameLayout[@content-desc="Color ' + str(i + 1) + '"]', False).click()
-#
-# # 질문 입력
-# input_textbox(find_by("ID", "questionInput", True), "오늘 할당된 테스트를 모두 완료했나요?")
-#
-# # 프리퀀시 설정
-# frequency_arr = ["DAY", "WEEK", "MONTH"]
-# for val in frequency_arr:
-#     set_frequency(val, 1)
+
+# 제목 입력
+input_textbox(find_by("ID", "nameInput", True), "테스트 진행 여부 확인")
+
+# 색상 설정 클릭
+for i in range(20):
+    find_by("ID", "colorButton", True).click()
+    find_by("XPATH", '//android.widget.FrameLayout[@content-desc="Color ' + str(i + 1) + '"]', False).click()
+
+# 질문 입력
+input_textbox(find_by("ID", "questionInput", True), "오늘 할당된 테스트를 모두 완료했나요?")
+
+# 프리퀀시 설정
+frequency_arr = ["DAY", "WEEK", "MONTH"]
+for val in frequency_arr:
+    set_frequency(val, 1)
 
 # 알람 설정
-set_alarm(12, 50, "PM", True)
+# set_alarm(12, 50, "PM", True)
 # 메모 입력
 input_textbox(find_by("ID", "notesInput", True), "테스트 메모")
 
 # 정의한 습관 저장
-save_all_btn = find_by("ID", "buttonSave", True).click()
+find_by("ID", "buttonSave", True).click()
 
 # 녹화 종료 및 mp4 파일 추출
 process.send_signal(subprocess.signal.SIGINT)
