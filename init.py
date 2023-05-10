@@ -13,7 +13,6 @@ import subprocess
 
 FILE_NAME = datetime.now().strftime("%Y%m%d%H%M%S") + '.mp4'
 DEVICE_RECORD_FILE = '/sdcard/Recordings/' + FILE_NAME
-SUFFIX = "org.isoron.uhabits"  # element
 PULL_LOCAL_PATH = '%s/' % os.getcwd() + 'record/'
 PULL_LOCAL_FILE = PULL_LOCAL_PATH + FILE_NAME
 # 녹화 파일 디렉토리 존재하지 않으면 디렉토리 생성
@@ -35,12 +34,9 @@ def tab_element(element, bounds):
     touch_action = TouchAction(driver)
     touch_action.tap(None, x, y).perform()
 
-def find_by(by_val, dest, need_suffixs):
+def find_by(by_val, dest):
     by = {"ID": By.ID, "XPATH": By.XPATH, "CLASS": By.CLASS_NAME}
     by_type = by.get(by_val)
-
-    # if need_suffixs is True:
-        # dest = SUFFIX + dest
 
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((by_type, dest)))
     element = driver.find_element(by_type, dest)
@@ -53,18 +49,18 @@ def input_textbox(element, text):
     return 0
 
 def set_alarm(hour, min, ampm, save_or_not):
-    find_by("ID", "reminderTimePicker", True).click()
+    find_by("ID", "reminderTimePicker").click()
     print(driver.find_elements(MobileBy.ANDROID_UIAUTOMATOR, value='new UiSelector().xPath("//android.widget.FrameLayout[@content-desc="Hours circular slider: 8"]/android.view.View[4]")'))
-    find_by("ID", "hours", True).send_keys(Keys.NUMPAD1)
+    find_by("ID", "hours").send_keys(Keys.NUMPAD1)
 
-    print(find_by("ID", "minutes", True).get_attribute("text"))
+    print(find_by("ID", "minutes").get_attribute("text"))
 
     if ampm == "PM":
-        find_by("XPATH", "//*[@resource-id='org.isoron.uhabits:id/ampm_hitspace']", True).click()
+        find_by("XPATH", "//*[@resource-id='org.isoron.uhabits:id/ampm_hitspace']").click()
     if save_or_not == True:
-        find_by("ID", "done_button", True).click()
+        find_by("ID", "done_button").click()
     else:
-        find_by("ID", "clear_button", True).click()
+        find_by("ID", "clear_button").click()
 
     return 0
 
@@ -85,10 +81,10 @@ def set_frequency(fre, value):
     list_of_fqcy = frequency.get(fre)
     print(list_of_fqcy[0], list_of_fqcy[1])
 
-    find_by("ID", "boolean_frequency_picker", True).click()
-    find_by("ID", list_of_fqcy[0], True).click()
-    input_textbox(find_by("ID", list_of_fqcy[1], True), value)
-    find_by("ID", "button1", False).click()
+    find_by("ID", "boolean_frequency_picker").click()
+    find_by("ID", list_of_fqcy[0]).click()
+    input_textbox(find_by("ID", list_of_fqcy[1]), value)
+    find_by("ID", "button1").click()
 
 
 # Device Remote 시작
@@ -108,23 +104,23 @@ process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
 
 # 최초 앱 실행시 가이드 팝업을 닫음
 for i in range(2):
-    find_by("ID", "next", True).click()
-find_by("ID", "done", True).click()
+    find_by("ID", "next").click()
+find_by("ID", "done").click()
 
 # + 버튼 클릭
-find_by("ID", "actionCreateHabit", True).click()
-find_by("ID", "buttonYesNo", True).click()
+find_by("ID", "actionCreateHabit").click()
+find_by("ID", "buttonYesNo").click()
 
 # 제목 입력
-input_textbox(find_by("ID", "nameInput", True), "테스트 진행 여부 확인")
+input_textbox(find_by("ID", "nameInput"), "테스트 진행 여부 확인")
 
 # 색상 설정 클릭
 for i in range(20):
-    find_by("ID", "colorButton", True).click()
-    find_by("XPATH", '//android.widget.FrameLayout[@content-desc="Color ' + str(i + 1) + '"]', False).click()
+    find_by("ID", "colorButton").click()
+    find_by("XPATH", '//android.widget.FrameLayout[@content-desc="Color ' + str(i + 1) + '"]').click()
 
 # 질문 입력
-input_textbox(find_by("ID", "questionInput", True), "오늘 할당된 테스트를 모두 완료했나요?")
+input_textbox(find_by("ID", "questionInput"), "오늘 할당된 테스트를 모두 완료했나요?")
 
 # 프리퀀시 설정
 frequency_arr = ["DAY", "WEEK", "MONTH"]
@@ -134,10 +130,10 @@ for val in frequency_arr:
 # 알람 설정
 # set_alarm(12, 50, "PM", True)
 # 메모 입력
-input_textbox(find_by("ID", "notesInput", True), "테스트 메모")
+input_textbox(find_by("ID", "notesInput"), "테스트 메모")
 
 # 정의한 습관 저장
-find_by("ID", "buttonSave", True).click()
+find_by("ID", "buttonSave").click()
 
 # 녹화 종료 및 mp4 파일 추출
 process.send_signal(subprocess.signal.SIGINT)
