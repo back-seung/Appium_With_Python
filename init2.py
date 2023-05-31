@@ -110,7 +110,6 @@ def set_alarm(ampm: str, save_or_not: bool):
 
 def set_frequency(fre: str, type: str, value: int):
     """
-
     :param fre: "DAY", "WEEK", "MONTH" only
     :param type: yesNo Type or Measurable Type
     :param value: frequency value
@@ -254,7 +253,7 @@ def del_habit(title_name: str):
     find_element("XPATH", "//*[@text='삭제']", False).click()
     find_element("XPATH", "//*[@text='네']", False).click()
 
-    print("## 습관 삭제 완료")
+    print("## 습관 삭제 종료")
 
 
 # Device Remote 시작
@@ -306,8 +305,16 @@ for habit in habits:
 # 습관 수정
 modified_arr = []
 for saved in habits:
-    print(saved)
     modified_arr.append(save_or_modify_habit("MODIFY", saved[1], saved[len(saved) - 1]))
+
+# 습관 수정 검증
+for i in range(len(saved_arr)):
+    saved = saved_arr[i][: -1]
+    modified = modified_arr[i][: -1]
+    for j in range(len(saved)):
+        if saved[j] == modified[j]:
+            print("ㄴ[수정 검증] - ERROR 기존 : ", saved[j], " != 수정 : ",modified[j],  " -> 수정되지 않음.")
+    print("ㄴ[수정 검증] - PASS, 수정되었습니다.")
 
 # 습관 삭제
 for saved in modified_arr:
